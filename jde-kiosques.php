@@ -1,9 +1,13 @@
 <?php
 /*
 Plugin Name: JDE Kiosques
-Description: Plugin de gestion des kiosques pour Jeux de l'Éducation.
-Version: 1.2
+Plugin URI: https://github.com/jeuxdeleducation/kiosques
+Description: Plugin de gestion des kiosques pour vos événements.
+Version: 1.0.0
 Author: Samuel Lavoie
+Author URI: https://jeuxdeleducation.com
+GitHub Plugin URI: https://github.com/jeuxdeleducation/kiosques
+GitHub Branch: main
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
