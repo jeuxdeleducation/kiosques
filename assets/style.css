@@ -1,0 +1,72 @@
+/* assets/style.css */
+
+#jde-kiosques-plan {
+    margin: 20px auto;
+    position: relative;
+}
+
+.kiosque-hotspot {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.8);
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
+}
+
+.kiosque-hotspot.admin {
+    cursor: move;
+}
+
+.kiosques-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.kiosque-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 150px;
+    text-align: center;
+    position: relative;
+}
+
+.kiosque-item[data-status="disponible"] {
+    background-color: #e0ffe0;
+}
+
+.kiosque-item[data-status="en_attente"] {
+    background-color: #fffbe0;
+}
+
+.kiosque-item[data-status="confirme"] {
+    background-color: #cce5ff;
+}
+
+.kiosque-item[data-status="annule"] {
+    background-color: #f8d7da;
+}
+
+.kiosque-number {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.kiosque-status {
+    display: block;
+    margin: 5px 0;
+}
+
+.kiosque-item input {
+    width: 90%;
+    margin: 5px 0;
+    padding: 5px;
+}
+
+.kiosque-item button {
+    padding: 5px 10px;
+    cursor: pointer;
+}
