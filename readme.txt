@@ -1,5 +1,5 @@
 === JDE Kiosques ===
-Contributors: votre_nom
+Contributors: Samuel Lavoie
 Tags: kiosques, réservation, événement, académique
 Requires at least: 5.0
 Tested up to: 6.0
