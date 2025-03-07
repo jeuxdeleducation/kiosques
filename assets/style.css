@@ -3,6 +3,7 @@
 #jde-kiosques-plan {
     margin: 20px auto;
     position: relative;
+    max-width: 100%;
 }
 
 .kiosque-hotspot {
@@ -14,6 +15,13 @@
     text-align: center;
     line-height: 40px;
     cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.kiosque-hotspot:hover {
+    transform: scale(1.1);
+    background: rgba(0, 123, 255, 0.8);
+    color: #fff;
 }
 
 .kiosque-hotspot.admin {
@@ -29,44 +37,54 @@
 .kiosque-item {
     border: 1px solid #ccc;
     padding: 10px;
-    width: 150px;
+    width: calc(33.333% - 10px);
     text-align: center;
-    position: relative;
+    background: #f9f9f9;
+    transition: background 0.3s ease-in-out;
 }
 
-.kiosque-item[data-status="disponible"] {
-    background-color: #e0ffe0;
+.kiosque-item:hover {
+    background: #e0e0e0;
 }
 
-.kiosque-item[data-status="en_attente"] {
-    background-color: #fffbe0;
+/* Indication d'état des kiosques */
+.kiosque-item.disponible {
+    background: #d4edda;
+    border-color: #155724;
+}
+.kiosque-item.reserve {
+    background: #f8d7da;
+    border-color: #721c24;
+}
+.kiosque-item.attente {
+    background: #fff3cd;
+    border-color: #856404;
 }
 
-.kiosque-item[data-status="confirme"] {
-    background-color: #cce5ff;
+/* Mode sombre */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #222;
+        color: #f1f1f1;
+    }
+    .kiosque-item {
+        background: #333;
+        border-color: #444;
+    }
+    .kiosque-item:hover {
+        background: #444;
+    }
 }
 
-.kiosque-item[data-status="annule"] {
-    background-color: #f8d7da;
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .kiosque-item {
+        width: calc(50% - 10px);
+    }
 }
 
-.kiosque-number {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
-.kiosque-status {
-    display: block;
-    margin: 5px 0;
-}
-
-.kiosque-item input {
-    width: 90%;
-    margin: 5px 0;
-    padding: 5px;
-}
-
-.kiosque-item button {
-    padding: 5px 10px;
-    cursor: pointer;
+@media screen and (max-width: 480px) {
+    .kiosque-item {
+        width: 100%;
+    }
 }
