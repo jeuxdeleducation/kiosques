@@ -1,0 +1,7 @@
+# Ignorer les fichiers WordPress non nécessaires
+*.log
+*.sql
+*.zip
+/wordpress/
+/wp-content/uploads/
+/wp-content/cache/
