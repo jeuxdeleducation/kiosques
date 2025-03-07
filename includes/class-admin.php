@@ -31,13 +31,10 @@ class JDE_Kiosques_Admin {
     }
 
     /**
-     * Enregistrement du menu principal dans l'administration WordPress.
+     * Enregistrement du menu principal et des sous-menus dans l'administration WordPress.
      */
     public static function register_admin_menu() {
-        if ( ! self::user_has_access() ) {
-            return;
-        }
-
+        // Menu principal du plugin (visible uniquement pour les administrateurs et les utilisateurs autorisés)
         add_menu_page(
             __( 'JDE Kiosques', 'jde-kiosques' ),
             __( 'JDE Kiosques', 'jde-kiosques' ),
@@ -47,6 +44,18 @@ class JDE_Kiosques_Admin {
             'dashicons-store',
             25
         );
+
+        // Ajouter une sous-page pour la gestion des accès (uniquement visible par les administrateurs)
+        if ( current_user_can( 'manage_options' ) ) {
+            add_submenu_page(
+                'jde-kiosques',
+                __( 'Gestion des accès', 'jde-kiosques' ),
+                __( 'Gestion des accès', 'jde-kiosques' ),
+                'manage_options',
+                'jde-kiosques-access',
+                array( __CLASS__, 'access_settings_page' )
+            );
+        }
     }
 
     /**
@@ -65,10 +74,28 @@ class JDE_Kiosques_Admin {
     }
 
     /**
-     * Affichage de la page des paramètres.
+     * Affichage de la page des paramètres du plugin.
      */
     public static function settings_page() {
         if ( ! self::user_has_access() ) {
+            wp_die( __( 'Accès refusé.', 'jde-kiosques' ) );
+        }
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Paramètres de JDE Kiosques', 'jde-kiosques' ); ?></h1>
+            <form method="post" action="options.php">
+                <?php settings_fields( 'jde_kiosques_settings_group' ); ?>
+                <?php submit_button(); ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    /**
+     * Affichage de la page de gestion des accès.
+     */
+    public static function access_settings_page() {
+        if ( ! current_user_can( 'manage_options' ) ) {
             wp_die( __( 'Accès refusé.', 'jde-kiosques' ) );
         }
 
@@ -76,13 +103,11 @@ class JDE_Kiosques_Admin {
         $authorized_users = get_option( 'jde_kiosques_authorized_users', array() );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Paramètres de JDE Kiosques', 'jde-kiosques' ); ?></h1>
+            <h1><?php esc_html_e( 'Gestion des accès - JDE Kiosques', 'jde-kiosques' ); ?></h1>
             <form method="post" action="options.php">
-                <?php
-                settings_fields( 'jde_kiosques_settings_group' );
-                ?>
-                <h2><?php esc_html_e( 'Gestion des accès', 'jde-kiosques' ); ?></h2>
-                <label><?php esc_html_e( 'Utilisateurs autorisés :', 'jde-kiosques' ); ?></label><br>
+                <?php settings_fields( 'jde_kiosques_settings_group' ); ?>
+                <h2><?php esc_html_e( 'Utilisateurs autorisés', 'jde-kiosques' ); ?></h2>
+                <label><?php esc_html_e( 'Sélectionnez les utilisateurs ayant accès aux paramètres du plugin :', 'jde-kiosques' ); ?></label><br>
                 <select name="jde_kiosques_authorized_users[]" multiple style="width: 300px; height: 100px;">
                     <?php foreach ( $users as $user ) : ?>
                         <option value="<?php echo esc_attr( $user->ID ); ?>" <?php selected( in_array( $user->ID, (array) $authorized_users ) ); ?>>
@@ -90,9 +115,7 @@ class JDE_Kiosques_Admin {
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <?php
-                submit_button();
-                ?>
+                <?php submit_button(); ?>
             </form>
         </div>
         <?php
