@@ -10,6 +10,7 @@ if ( ! current_user_can( 'delete_plugins' ) ) {
 
 // Suppression des options du plugin
 delete_option( 'jde_kiosques_total' );
+delete_option( 'jde_kiosques_authorized_users' );
 delete_option( 'jde_kiosques_restrict_access' );
 
 // Suppression des transients pour nettoyer le cache

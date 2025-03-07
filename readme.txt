@@ -31,21 +31,16 @@ Dans les paramètres du plugin, sélectionnez les utilisateurs qui auront accès
 Accédez aux réglages du plugin et utilisez l'option de réinitialisation pour vider la base de données des réservations.
 
 == Changelog ==
+= 1.2.4 =
+* Amélioration de la gestion des accès : les pages restent visibles, mais affichent un message d'erreur si l'utilisateur n'a pas les permissions.
+* Correction et réintégration du cache pour l'affichage des kiosques.
+* Optimisation de la gestion des rôles et permissions pour plus de flexibilité.
+
 = 1.2.3 =
 * Ajout d'une fonctionnalité permettant de gérer les utilisateurs autorisés à accéder aux paramètres du plugin.
 * Sécurisation des accès aux pages d'administration.
 * Amélioration de la gestion des paramètres avec une interface plus intuitive.
 
-= 1.2.1 =
-* Amélioration de la sécurité des requêtes AJAX.
-* Ajout d’un cache pour optimiser les performances.
-* Amélioration du mode sombre et du design responsive.
-
 == Upgrade Notice ==
-= 1.2.3 =
-Cette mise à jour ajoute la gestion des accès utilisateurs et sécurise l'administration du plugin. Mettez à jour immédiatement.
-
-== Screenshots ==
-1. **Interface de réservation des kiosques.**
-2. **Administration des réservations dans WordPress.**
-3. **Nouvelle interface de gestion des accès administratifs.**
+= 1.2.4 =
+Cette mise à jour améliore la flexibilité d'affichage et optimise la gestion des accès. Mettez à jour immédiatement.

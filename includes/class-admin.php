@@ -34,11 +34,11 @@ class JDE_Kiosques_Admin {
      * Enregistrement du menu principal et des sous-menus dans l'administration WordPress.
      */
     public static function register_admin_menu() {
-        // Menu principal du plugin (visible uniquement pour les administrateurs et les utilisateurs autorisés)
+        // Menu principal du plugin
         add_menu_page(
             __( 'JDE Kiosques', 'jde-kiosques' ),
             __( 'JDE Kiosques', 'jde-kiosques' ),
-            'manage_options',
+            'read',
             'jde-kiosques',
             array( __CLASS__, 'settings_page' ),
             'dashicons-store',
@@ -46,16 +46,14 @@ class JDE_Kiosques_Admin {
         );
 
         // Ajouter une sous-page pour la gestion des accès (uniquement visible par les administrateurs)
-        if ( current_user_can( 'manage_options' ) ) {
-            add_submenu_page(
-                'jde-kiosques',
-                __( 'Gestion des accès', 'jde-kiosques' ),
-                __( 'Gestion des accès', 'jde-kiosques' ),
-                'manage_options',
-                'jde-kiosques-access',
-                array( __CLASS__, 'access_settings_page' )
-            );
-        }
+        add_submenu_page(
+            'jde-kiosques',
+            __( 'Gestion des accès', 'jde-kiosques' ),
+            __( 'Gestion des accès', 'jde-kiosques' ),
+            'read',
+            'jde-kiosques-access',
+            array( __CLASS__, 'access_settings_page' )
+        );
     }
 
     /**
@@ -78,7 +76,8 @@ class JDE_Kiosques_Admin {
      */
     public static function settings_page() {
         if ( ! self::user_has_access() ) {
-            wp_die( __( 'Accès refusé.', 'jde-kiosques' ) );
+            echo '<div class="notice notice-error"><p>' . __( 'Vous n’avez pas la permission d’accéder à cette page.', 'jde-kiosques' ) . '</p></div>';
+            return;
         }
         ?>
         <div class="wrap">
@@ -96,7 +95,8 @@ class JDE_Kiosques_Admin {
      */
     public static function access_settings_page() {
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_die( __( 'Accès refusé.', 'jde-kiosques' ) );
+            echo '<div class="notice notice-error"><p>' . __( 'Vous n’avez pas la permission d’accéder à cette page.', 'jde-kiosques' ) . '</p></div>';
+            return;
         }
 
         $users = get_users( array( 'fields' => array( 'ID', 'display_name' ) ) );
