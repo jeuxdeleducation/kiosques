@@ -16,13 +16,17 @@ class JDE_Kiosques_Admin {
      * Vérifie si l'utilisateur a accès aux paramètres du plugin.
      */
     public static function user_has_access() {
+        if ( ! function_exists( 'wp_get_current_user' ) ) {
+            require_once ABSPATH . 'wp-includes/pluggable.php';
+        }
+
         if ( current_user_can( 'manage_options' ) ) {
             return true;
         }
         
         $authorized_users = get_option( 'jde_kiosques_authorized_users', array() );
         $current_user_id = get_current_user_id();
-        
+
         return in_array( $current_user_id, (array) $authorized_users );
     }
 
