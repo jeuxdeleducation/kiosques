@@ -27,33 +27,20 @@ class JDE_Kiosques_Settings {
      * Affichage de la section des paramètres.
      */
     public static function settings_page() {
-        if ( ! JDE_Kiosques_Admin::user_has_access() ) {
-            wp_die( __( 'Accès refusé.', 'jde-kiosques' ) );
-        }
-
-        $users = get_users( array( 'fields' => array( 'ID', 'display_name' ) ) );
-        $authorized_users = get_option( 'jde_kiosques_authorized_users', array() );
         ?>
         <div class="wrap">
             <h1><?php esc_html_e( 'Paramètres de JDE Kiosques', 'jde-kiosques' ); ?></h1>
-            <form method="post" action="options.php">
-                <?php
-                settings_fields( 'jde_kiosques_settings_group' );
-                do_settings_sections( 'jde-kiosques' );
-                ?>
-                <h2><?php esc_html_e( 'Gestion des accès', 'jde-kiosques' ); ?></h2>
-                <label><?php esc_html_e( 'Utilisateurs autorisés :', 'jde-kiosques' ); ?></label><br>
-                <select name="jde_kiosques_authorized_users[]" multiple style="width: 300px; height: 100px;">
-                    <?php foreach ( $users as $user ) : ?>
-                        <option value="<?php echo esc_attr( $user->ID ); ?>" <?php selected( in_array( $user->ID, (array) $authorized_users ) ); ?>>
-                            <?php echo esc_html( $user->display_name ); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <?php
-                submit_button();
-                ?>
-            </form>
+            <?php if ( ! JDE_Kiosques_Admin::user_has_access() ) : ?>
+                <div class="notice notice-error"><p><?php esc_html_e( 'Vous n’avez pas la permission d’accéder à cette page.', 'jde-kiosques' ); ?></p></div>
+            <?php else : ?>
+                <form method="post" action="options.php">
+                    <?php
+                    settings_fields( 'jde_kiosques_settings_group' );
+                    do_settings_sections( 'jde-kiosques' );
+                    submit_button();
+                    ?>
+                </form>
+            <?php endif; ?>
         </div>
         <?php
     }
