@@ -29,7 +29,7 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 }
 
 // Définition des constantes
-define( 'JDE_KIOSQUES_VERSION', '1.2.3' );
+define( 'JDE_KIOSQUES_VERSION', '1.2.4' );
 define( 'JDE_KIOSQUES_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'JDE_KIOSQUES_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'JDE_KIOSQUES_LOGS_DIR', WP_CONTENT_DIR . '/uploads/jde-kiosques-logs/' );
@@ -44,26 +44,8 @@ spl_autoload_register( function( $class ) {
     }
 });
 
-// Vérification d'accès global pour les utilisateurs
-function jde_kiosques_user_has_access() {
-    if ( ! function_exists( 'wp_get_current_user' ) ) {
-        require_once ABSPATH . 'wp-includes/pluggable.php';
-    }
-
-    if ( current_user_can( 'manage_options' ) ) {
-        return true;
-    }
-    
-    $authorized_users = get_option( 'jde_kiosques_authorized_users', array() );
-    return in_array( get_current_user_id(), (array) $authorized_users );
-}
-
-// Initialisation des classes uniquement si l'utilisateur a accès
+// Initialisation des classes du plugin
 function jde_kiosques_init() {
-    if ( ! jde_kiosques_user_has_access() ) {
-        return;
-    }
-
     new JDE_Kiosques_Admin();
     new JDE_Kiosques_Ajax();
     new JDE_Kiosques_Public();
