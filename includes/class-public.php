@@ -9,30 +9,31 @@ class JDE_Kiosques_Public {
     }
 
     public function display_kiosques() {
-        $kiosques = get_transient( 'jde_kiosques_list' );
+        $force_refresh = isset( $_GET['refresh_kiosques'] ) && current_user_can( 'manage_options' );
         
-        if ( false === $kiosques ) {
+        $kiosques = wp_cache_get( 'jde_kiosques_list' );
+        
+        if ( false === $kiosques || $force_refresh ) {
             global $wpdb;
-            $table_name = $wpdb->prefix . 'jde_kiosques';
+            $table_name = $wpdb->prefix . 'jde_kiosques_reservations';
             $kiosques = $wpdb->get_results( "SELECT * FROM $table_name" );
-            set_transient( 'jde_kiosques_list', $kiosques, 12 * HOUR_IN_SECONDS );
+            
+            wp_cache_set( 'jde_kiosques_list', $kiosques, '', 300 ); // Cache pendant 5 minutes
         }
         
         if ( empty( $kiosques ) ) {
             return '<p>' . __( 'Aucun kiosque disponible.', 'jde-kiosques' ) . '</p>';
         }
         
-        ob_start();
-        echo '<div class="jde-kiosques-list">';
+        $output = '<div class="kiosques-list">';
         foreach ( $kiosques as $kiosque ) {
-            echo '<div class="kiosque-item" aria-labelledby="kiosque-' . esc_attr( $kiosque->id ) . '-title">';
-            echo '<h2 id="kiosque-' . esc_attr( $kiosque->id ) . '-title">' . esc_html( $kiosque->nom ) . '</h2>';
-            echo '<p>' . esc_html( $kiosque->description ) . '</p>';
-            echo '</div>';
+            $output .= '<div class="kiosque-item">';
+            $output .= '<strong>' . esc_html( $kiosque->kiosk_number ) . '</strong> - ' . esc_html( $kiosque->partner_code );
+            $output .= '</div>';
         }
-        echo '</div>';
+        $output .= '</div>';
         
-        return ob_get_clean();
+        return $output;
     }
 }
 
