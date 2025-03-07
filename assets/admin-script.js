@@ -1,48 +1,48 @@
 // assets/admin-script.js
-
 jQuery(document).ready(function($) {
-    // Rendre les hotspots (version admin) déplaçables dans le conteneur
-    $('#positionnement-container .kiosque-hotspot.admin').draggable({
-        containment: "#positionnement-container"
+    if (typeof $.fn.draggable === 'undefined') {
+        console.error('jQuery UI Draggable non chargé.');
+        return;
+    }
+
+    var $hotspots = $('#positionnement-container .kiosque-hotspot.admin');
+    
+    // Rendre les hotspots déplaçables
+    $hotspots.draggable({
+        containment: '#positionnement-container',
+        stop: function() {
+            console.log('Position sauvegardée:', $(this).position());
+        }
     });
     
-    // Sauvegarder les positions lors du clic sur le bouton
+    // Bouton de sauvegarde
     $('#save-positions').on('click', function(e) {
         e.preventDefault();
         var positions = {};
-        // Pour chaque hotspot, calculer la position en pourcentage relative au conteneur
-        $('#positionnement-container .kiosque-hotspot.admin').each(function() {
+        
+        $hotspots.each(function() {
             var $this = $(this);
-            var kioskId = $this.data('kiosk');
-            var containerWidth = $('#positionnement-container').width();
-            var containerHeight = $('#positionnement-container').height();
-            var offset = $this.position();
-            var posXPercent = (offset.left / containerWidth) * 100;
-            var posYPercent = (offset.top / containerHeight) * 100;
-            positions[kioskId] = {
-                x: posXPercent,
-                y: posYPercent
+            positions[$this.data('id')] = {
+                left: ($this.position().left / $('#positionnement-container').width()) * 100 + '%',
+                top: ($this.position().top / $('#positionnement-container').height()) * 100 + '%'
             };
         });
         
-        // Envoyer les positions via AJAX
-        $.ajax({
-            url: jdeKiosquesAjax.ajax_url,
-            method: 'POST',
-            data: {
-                action: 'jde_kiosques_save_positions',
-                nonce: jdeKiosquesAjax.nonce,
-                positions: positions
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert(response.data);
-                } else {
-                    alert(response.data);
-                }
-            },
-            error: function() {
-                alert('Erreur lors de la sauvegarde des positions.');
+        console.log('Positions enregistrées:', positions);
+        
+        $('#save-positions').text('Sauvegarde...');
+        
+        $.post(jdeKiosquesAjax.ajax_url, {
+            action: 'save_positions',
+            positions: positions,
+            security: jdeKiosquesAjax.nonce
+        }, function(response) {
+            $('#save-positions').text('Enregistrer');
+            if (response.success) {
+                alert('Positions sauvegardées avec succès!');
+            } else {
+                alert('Erreur lors de la sauvegarde.');
+                console.error(response);
             }
         });
     });
