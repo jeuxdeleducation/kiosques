@@ -8,7 +8,30 @@ class JDE_Kiosques_Public {
         add_shortcode( 'jde_kiosques', array( $this, 'display_kiosques' ) );
     }
 
+    /**
+     * Vérifie si l'utilisateur a accès aux fonctionnalités publiques.
+     */
+    public function user_has_access() {
+        if ( ! function_exists( 'wp_get_current_user' ) ) {
+            require_once ABSPATH . 'wp-includes/pluggable.php';
+        }
+        
+        if ( current_user_can( 'manage_options' ) ) {
+            return true;
+        }
+        
+        $authorized_users = get_option( 'jde_kiosques_authorized_users', array() );
+        return in_array( get_current_user_id(), (array) $authorized_users );
+    }
+
+    /**
+     * Affiche la liste des kiosques.
+     */
     public function display_kiosques() {
+        if ( ! $this->user_has_access() ) {
+            return '<div class="notice notice-error"><p>' . __( 'Vous n’avez pas la permission de voir cette section.', 'jde-kiosques' ) . '</p></div>';
+        }
+        
         $force_refresh = isset( $_GET['refresh_kiosques'] ) && current_user_can( 'manage_options' );
         
         $kiosques = wp_cache_get( 'jde_kiosques_list' );
