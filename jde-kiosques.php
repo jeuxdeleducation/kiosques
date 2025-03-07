@@ -2,7 +2,7 @@
 /*
 Plugin Name: JDE Kiosques
 Description: Plugin de gestion des kiosques pour Jeux de l'Éducation.
-Version: 1.2.1
+Version: 1.2.2
 Author: Samuel Lavoie
 Author URI: https://github.com/jeuxdeleducation
 License: GPL2
