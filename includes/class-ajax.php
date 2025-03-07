@@ -11,30 +11,35 @@ class JDE_Kiosques_Ajax {
         add_action( 'wp_ajax_jde_kiosques_confirm', array( $this, 'confirm_reservation' ) );
         add_action( 'wp_ajax_jde_kiosques_cancel', array( $this, 'cancel_reservation' ) );
         
-        // Nouvelle action AJAX pour sauvegarder les positions
         add_action( 'wp_ajax_jde_kiosques_save_positions', array( $this, 'save_positions' ) );
     }
     
     public function reserve_kiosk() {
         check_ajax_referer( 'jde_kiosques_nonce', 'nonce' );
-        $kiosk_number = isset( $_POST['kiosk_number'] ) ? intval( $_POST['kiosk_number'] ) : 0;
-        $access_code  = isset( $_POST['access_code'] ) ? sanitize_text_field( $_POST['access_code'] ) : '';
-        $company_name = isset( $_POST['company_name'] ) ? sanitize_text_field( $_POST['company_name'] ) : '';
-        if ( ! $kiosk_number || empty( $access_code ) || empty( $company_name ) ) {
+
+        if ( ! isset( $_POST['kiosk_number'], $_POST['access_code'], $_POST['company_name'] ) ) {
             wp_send_json_error( __( 'Données manquantes.', 'jde-kiosques' ) );
         }
+
+        $kiosk_number = intval( $_POST['kiosk_number'] );
+        $access_code  = sanitize_text_field( $_POST['access_code'] );
+        $company_name = sanitize_text_field( $_POST['company_name'] );
+
+        if ( ! $kiosk_number || empty( $access_code ) || empty( $company_name ) ) {
+            wp_send_json_error( __( 'Informations invalides.', 'jde-kiosques' ) );
+        }
+
         $db = new JDE_Kiosques_Database();
-        $existing = $db->get_reservation_by_kiosk( $kiosk_number );
-        if ( $existing ) {
+        if ( $db->get_reservation_by_kiosk( $kiosk_number ) ) {
             wp_send_json_error( __( 'Ce kiosque est déjà réservé.', 'jde-kiosques' ) );
         }
-        $result = $db->add_reservation( $kiosk_number, $company_name, $access_code );
-        if ( $result ) {
+
+        if ( $db->add_reservation( $kiosk_number, $company_name, $access_code ) ) {
             JDE_Kiosques_Logs::add_log( "Réservation créée pour le kiosque {$kiosk_number} par {$company_name}" );
             wp_send_json_success( __( 'Réservation en attente de validation.', 'jde-kiosques' ) );
-        } else {
-            wp_send_json_error( __( 'Erreur lors de la réservation.', 'jde-kiosques' ) );
         }
+
+        wp_send_json_error( __( 'Erreur lors de la réservation.', 'jde-kiosques' ) );
     }
     
     public function confirm_reservation() {
@@ -47,13 +52,11 @@ class JDE_Kiosques_Ajax {
             wp_send_json_error( __( 'ID de réservation manquant.', 'jde-kiosques' ) );
         }
         $db = new JDE_Kiosques_Database();
-        $result = $db->update_reservation_status( $reservation_id, 'confirme' );
-        if ( $result !== false ) {
+        if ( $db->update_reservation_status( $reservation_id, 'confirme' ) !== false ) {
             JDE_Kiosques_Logs::add_log( "Réservation ID {$reservation_id} confirmée." );
             wp_send_json_success( __( 'Réservation confirmée.', 'jde-kiosques' ) );
-        } else {
-            wp_send_json_error( __( 'Erreur lors de la validation.', 'jde-kiosques' ) );
         }
+        wp_send_json_error( __( 'Erreur lors de la validation.', 'jde-kiosques' ) );
     }
     
     public function cancel_reservation() {
@@ -66,13 +69,11 @@ class JDE_Kiosques_Ajax {
             wp_send_json_error( __( 'ID de réservation manquant.', 'jde-kiosques' ) );
         }
         $db = new JDE_Kiosques_Database();
-        $result = $db->update_reservation_status( $reservation_id, 'annule' );
-        if ( $result !== false ) {
+        if ( $db->update_reservation_status( $reservation_id, 'annule' ) !== false ) {
             JDE_Kiosques_Logs::add_log( "Réservation ID {$reservation_id} annulée." );
             wp_send_json_success( __( 'Réservation annulée.', 'jde-kiosques' ) );
-        } else {
-            wp_send_json_error( __( 'Erreur lors de l\'annulation.', 'jde-kiosques' ) );
         }
+        wp_send_json_error( __( 'Erreur lors de l'annulation.', 'jde-kiosques' ) );
     }
     
     public function save_positions() {
