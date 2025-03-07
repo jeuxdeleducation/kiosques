@@ -2,73 +2,58 @@
 /*
 Plugin Name: JDE Kiosques
 Description: Plugin de gestion des kiosques pour Jeux de l'Éducation.
-Version: 1.0.0
+Version: 1.1.0
 Author: Samuel Lavoie
 Author URI: https://github.com/jeuxdeleducation
 License: GPL2
 GitHub Plugin URI: https://github.com/jeuxdeleducation/kiosques
 Plugin URI: https://github.com/jeuxdeleducation/kiosques
+Requires PHP: 7.2
+Requires at least: 5.0
+Tested up to: 6.4
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-/** Enqueue des scripts front-end **/
+// Vérification de la version de PHP
+if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
+    function jde_kiosques_admin_notice() {
+        echo '<div class="error"><p>' . __( 'JDE Kiosques nécessite PHP 7.2 ou supérieur.', 'jde-kiosques' ) . '</p></div>';
+    }
+    add_action( 'admin_notices', 'jde_kiosques_admin_notice' );
+    return;
+}
+
+// Chargement des fichiers nécessaires
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-admin.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-ajax.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-public.php';
+
+JDE_Kiosques_Admin::init();
+
+/**
+ * Enqueue des scripts et styles uniquement sur la page des kiosques
+ */
 function jde_kiosques_enqueue_scripts() {
-    wp_enqueue_script(
-        'jde-kiosques-script',
-        plugins_url( 'assets/script.js', __FILE__ ),
-        array('jquery'),
-        '1.1',
-        true
-    );
-    // Localisation du script pour AJAX
-    wp_localize_script(
-        'jde-kiosques-script',
-        'jdeKiosquesAjax',
-        array(
-            'ajax_url' => admin_url( 'admin-ajax.php' ),
-            'nonce'    => wp_create_nonce( 'jde-kiosques-nonce' )
-        )
-    );
-}
-add_action( 'wp_enqueue_scripts', 'jde_kiosques_enqueue_scripts' );
-
-/** Inclusion du fichier d'administration (uniquement dans l'admin) **/
-if ( is_admin() ) {
-    require_once plugin_dir_path( __FILE__ ) . 'includes/class-admin.php';
-    JDE_Kiosques_Admin::init();
-}
-
-/** Gestion de l'AJAX côté front-end pour réserver un kiosque **/
-function jde_kiosques_reserve_kiosk() {
-    check_ajax_referer( 'jde-kiosques-nonce', 'security' );
-    
-    $kiosk_number = isset( $_POST['kiosk_number'] ) ? intval( $_POST['kiosk_number'] ) : 0;
-    $partner_code = isset( $_POST['partner_code'] ) ? sanitize_text_field( $_POST['partner_code'] ) : '';
-
-    if ( $kiosk_number > 0 && ! empty( $partner_code ) ) {
-        // Exemple simple : sauvegarde dans une option.
-        $reservations = get_option( 'jde_kiosques_reservations', array() );
-        $reservations[] = array(
-            'kiosk_number' => $kiosk_number,
-            'partner_code' => $partner_code,
-            'date'         => current_time( 'mysql' )
+    if ( is_page( 'kiosques' ) ) {
+        wp_enqueue_script(
+            'jde-kiosques-script',
+            plugin_dir_url(__FILE__) . 'assets/script.js',
+            array('jquery'),
+            '1.1',
+            true
         );
-        update_option( 'jde_kiosques_reservations', $reservations );
 
-        $response = array(
-            'success' => true,
-            'message' => 'Réservation pour le kiosque #' . $kiosk_number . ' enregistrée avec succès!'
-        );
-    } else {
-        $response = array(
-            'success' => false,
-            'message' => 'Erreur : numéro de kiosque ou code partenaire manquant.'
+        wp_localize_script(
+            'jde-kiosques-script',
+            'jdeKiosquesAjax',
+            array(
+                'ajax_url' => admin_url( 'admin-ajax.php' ),
+                'nonce'    => wp_create_nonce( 'jde-kiosques-nonce' )
+            )
         );
     }
-    wp_send_json( $response );
 }
-add_action( 'wp_ajax_reserve_kiosk', 'jde_kiosques_reserve_kiosk' );
-add_action( 'wp_ajax_nopriv_reserve_kiosk', 'jde_kiosques_reserve_kiosk' );
+add_action( 'wp_enqueue_scripts', 'jde_kiosques_enqueue_scripts' );
