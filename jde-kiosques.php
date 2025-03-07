@@ -2,7 +2,7 @@
 /*
 Plugin Name: JDE Kiosques
 Description: Plugin de gestion des kiosques pour Jeux de l'Éducation.
-Version: 1.2.2
+Version: 1.2.3
 Author: Samuel Lavoie
 Author URI: https://github.com/jeuxdeleducation
 License: GPL2
@@ -44,17 +44,28 @@ spl_autoload_register( function( $class ) {
     }
 });
 
-// Initialisation des classes
-function jde_kiosques_init() {
-    new JDE_Kiosques_Admin();
-    new JDE_Kiosques_Ajax();
-    new JDE_Kiosques_Public();
-    new JDE_Kiosques_Settings();
-    new JDE_Kiosques_Widget();
-    
-    load_plugin_textdomain( 'jde-kiosques', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+// Vérification d'accès global pour les utilisateurs
+function jde_kiosques_user_has_access() {
+    if ( current_user_can( 'manage_options' ) ) {
+        return true;
+    }
+    $authorized_users = get_option( 'jde_kiosques_authorized_users', array() );
+    return in_array( get_current_user_id(), (array) $authorized_users );
 }
-add_action( 'plugins_loaded', 'jde_kiosques_init' );
+
+// Initialisation des classes uniquement si l'utilisateur a accès
+if ( jde_kiosques_user_has_access() ) {
+    function jde_kiosques_init() {
+        new JDE_Kiosques_Admin();
+        new JDE_Kiosques_Ajax();
+        new JDE_Kiosques_Public();
+        new JDE_Kiosques_Settings();
+        new JDE_Kiosques_Widget();
+        
+        load_plugin_textdomain( 'jde-kiosques', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+    }
+    add_action( 'plugins_loaded', 'jde_kiosques_init' );
+}
 
 // Activation du plugin
 function jde_kiosques_activate() {
