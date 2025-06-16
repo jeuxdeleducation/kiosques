@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
         $this.prop('disabled', true).text('Réservation en cours...');
 
         $.post(jdeKiosquesAjax.ajax_url, {
-            action: 'reserve_kiosk',
+            action: 'jde_kiosques_reserve',
             kiosk_number: kioskID,
             partner_code: partnerCode,
             security: jdeKiosquesAjax.nonce
